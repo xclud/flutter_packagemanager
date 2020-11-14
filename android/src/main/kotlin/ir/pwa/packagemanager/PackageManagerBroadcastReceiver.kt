@@ -24,6 +24,11 @@ class PackageManagerBroadcastReceiver(private val methodChannel: MethodChannel) 
 
         val json = JSONObject()
         json.put("action", p1.action)
+        json.put("data", p1.data.toString())
+        json.put("flags", p1.flags)
+        json.put("package", p1.`package`)
+        json.put("scheme", p1.scheme)
+        json.put("type", p1.type)
 
         if (p1.extras != null) {
             val keys = p1.extras!!.keySet()

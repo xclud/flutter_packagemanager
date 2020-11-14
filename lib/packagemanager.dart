@@ -25,13 +25,13 @@ class PackageManager {
 
   Future<String> getLauncherPackageName() async {
     final String packageName =
-    await _channel.invokeMethod('getLauncherPackageName');
+        await _channel.invokeMethod('getLauncherPackageName');
     return packageName;
   }
 
   Future<List<String>> getPackagesForUid(int uid) async {
     final List<String> packages =
-    await _channel.invokeMethod('getPackagesForUid', uid);
+        await _channel.invokeMethod('getPackagesForUid', uid);
     return packages;
   }
 
@@ -42,4 +42,11 @@ class PackageManager {
   Future<void> openDefaultAppsSettings() async {
     await _channel.invokeMethod('openDefaultAppsSettings');
   }
+}
+
+class Intent {
+  static const String PACKAGE_FULLY_REMOVED =
+      'android.intent.action.PACKAGE_FULLY_REMOVED';
+
+  static const String PACKAGE_REMOVED = 'android.intent.action.PACKAGE_REMOVED';
 }

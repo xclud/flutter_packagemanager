@@ -37,5 +37,24 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+
+       <receiver android:name="ir.pwa.cassini.PackageManagerBroadcastReceiver"  android:exported="true" android:enabled="true">
+           <intent-filter>
+               <action android:name="android.intent.action.BOOT_COMPLETED"/>
+               <action android:name="android.intent.action.PACKAGE_ADDED" />
+               <action android:name="android.intent.action.PACKAGE_CHANGED" />
+               <action android:name="android.intent.action.PACKAGE_DATA_CLEARED" />
+               <action android:name="android.intent.action.PACKAGE_FIRST_LAUNCH" />
+               <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+               <action android:name="android.intent.action.PACKAGE_INSTALL" />
+               <action android:name="android.intent.action.PACKAGE_NEEDS_VERIFICATION" />
+               <action android:name="android.intent.action.PACKAGE_REMOVED" />
+               <action android:name="android.intent.action.PACKAGE_REPLACED" />
+               <action android:name="android.intent.action.PACKAGE_VERIFIED" />
+               <action android:name="android.intent.action.PACKAGES_SUSPENDED" />
+               <action android:name="android.intent.action.PACKAGES_UNSUSPENDED" />
+           </intent-filter>
+       </receiver>
     </application>
 </manifest>
