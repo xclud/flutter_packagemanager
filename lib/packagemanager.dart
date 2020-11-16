@@ -45,8 +45,11 @@ class PackageManager {
 }
 
 class Intent {
-  static const String PACKAGE_FULLY_REMOVED =
+  static const String ACTION_PACKAGE_ADDED =
+      'android.intent.action.PACKAGE_ADDED';
+  static const String ACTION_PACKAGE_FULLY_REMOVED =
       'android.intent.action.PACKAGE_FULLY_REMOVED';
 
-  static const String PACKAGE_REMOVED = 'android.intent.action.PACKAGE_REMOVED';
+  static const String ACTION_PACKAGE_REMOVED =
+      'android.intent.action.PACKAGE_REMOVED';
 }
