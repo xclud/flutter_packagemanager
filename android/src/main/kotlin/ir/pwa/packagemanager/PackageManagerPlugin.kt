@@ -53,8 +53,10 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        } else if (call.method == "getLauncherPackageName") {
-            result.success(getLauncherPackageName())
+        } else if (call.method == "resolveActivity") {
+            val action = call.argument<String>("action")
+            val categories = call.argument<Array<String>>("categories");
+            result.success(resolveActivity(action, categories))
         } else if (call.method == "uninstallPackage") {
             val packageName = call.arguments<String>()
             uninstallPackage(packageName)
@@ -75,10 +77,16 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
         context.unregisterReceiver(broadcastReceiver)
     }
 
-    private fun getLauncherPackageName(): String? {
+    private fun resolveActivity(action: String, categories: Array<String>?): String? {
         val intent = Intent()
-        intent.action = Intent.ACTION_MAIN
-        intent.addCategory(Intent.CATEGORY_HOME)
+        intent.action = action
+
+        if (categories != null) {
+            for (category in categories) {
+                intent.addCategory(category)
+            }
+        }
+
         val packageManager = context.packageManager
         val result = packageManager.resolveActivity(intent, 0)
         return if (result?.activityInfo != null) {
