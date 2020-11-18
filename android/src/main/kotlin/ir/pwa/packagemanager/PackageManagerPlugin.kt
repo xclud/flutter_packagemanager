@@ -156,28 +156,29 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         val w = WallpaperManager.getInstance(context)
         w.setWallpaperOffsetSteps(xStep, yStep)
 
-
-        override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-            activity = binding.activity
-        }
-
-        override fun onDetachedFromActivityForConfigChanges() {
-            // The Activity your plugin was associated with has been
-            // destroyed due to config changes. It will be right back
-            // but your plugin must clean up any references to that
-            // Activity and associated resources.
-        }
-
-        override fun onReattachedToActivityForConfigChanges(
-                binding: ActivityPluginBinding
-        ) {
-            activity = binding.activity
-        }
-
-        override fun onDetachedFromActivity() {
-            // Your plugin is no longer associated with an Activity.
-            // You must clean up all resources and references. Your
-            // plugin may, or may not ever be associated with an Activity
-            // again.
-        }
     }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        // The Activity your plugin was associated with has been
+        // destroyed due to config changes. It will be right back
+        // but your plugin must clean up any references to that
+        // Activity and associated resources.
+    }
+
+    override fun onReattachedToActivityForConfigChanges(
+            binding: ActivityPluginBinding
+    ) {
+        activity = binding.activity
+    }
+
+    override fun onDetachedFromActivity() {
+        // Your plugin is no longer associated with an Activity.
+        // You must clean up all resources and references. Your
+        // plugin may, or may not ever be associated with an Activity
+        // again.
+    }
+}
