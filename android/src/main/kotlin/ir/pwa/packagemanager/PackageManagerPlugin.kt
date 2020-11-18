@@ -106,7 +106,16 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
         return context.packageName;
     }
 
+    @SuppressLint("InlinedApi")
     private fun openDefaultAppsSettings() {
+        /* Some Huawei devices don't let us reset normally, handle it by opening preferred apps */
+        val preferredApps = Intent("com.android.settings.PREFERRED_SETTINGS");
+        preferredApps.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        if (context.packageManager.resolveActivity(preferredApps, 0) != null) {
+            context.startActivity(preferredApps);
+            return
+        }
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             val intent = Intent(Settings.ACTION_HOME_SETTINGS)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
