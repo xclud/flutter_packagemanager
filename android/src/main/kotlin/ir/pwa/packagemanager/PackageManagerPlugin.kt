@@ -1,7 +1,10 @@
 package ir.pwa.packagemanager
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.WallpaperManager
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -14,15 +17,18 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
 
 /** PackageManagerPlugin */
-class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
+class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
+    private lateinit var activity: Activity
     private lateinit var broadcastReceiver: PackageManagerBroadcastReceiver
 
     @SuppressLint("InlinedApi")
@@ -69,6 +75,16 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
         } else if (call.method == "getPackagesForUid") {
             val packages = context.packageManager.getPackagesForUid(call.arguments<Int>())
             result.success(packages)
+        } else if (call.method == "setWallpaperOffsets") {
+            val xOffset = call.argument<Double>("xOffset")
+            val yOffset = call.argument<Double>("yOffset")
+            setWallpaperOffsets(xOffset!!.toFloat(), yOffset!!.toFloat())
+            result.success(true)
+        } else if (call.method == "setWallpaperOffsetSteps") {
+            val xStep = call.argument<Double>("xStep")
+            val yStep = call.argument<Double>("yStep")
+            setWallpaperOffsetSteps(xStep!!.toFloat(), yStep!!.toFloat())
+            result.success(true)
         } else {
             result.notImplemented()
         }
@@ -126,4 +142,42 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
             context.startActivity(intent);
         }
     }
-}
+
+
+    @SuppressLint("NewApi")
+    private fun setWallpaperOffsets(xOffset: Float, yOffset: Float) {
+        val b = activity.window.decorView.windowToken;
+        val w = WallpaperManager.getInstance(context)
+        w.setWallpaperOffsets(b, xOffset, yOffset)
+    }
+
+    @SuppressLint("NewApi")
+    private fun setWallpaperOffsetSteps(xStep: Float, yStep: Float) {
+        val w = WallpaperManager.getInstance(context)
+        w.setWallpaperOffsetSteps(xStep, yStep)
+
+
+        override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+            activity = binding.activity
+        }
+
+        override fun onDetachedFromActivityForConfigChanges() {
+            // The Activity your plugin was associated with has been
+            // destroyed due to config changes. It will be right back
+            // but your plugin must clean up any references to that
+            // Activity and associated resources.
+        }
+
+        override fun onReattachedToActivityForConfigChanges(
+                binding: ActivityPluginBinding
+        ) {
+            activity = binding.activity
+        }
+
+        override fun onDetachedFromActivity() {
+            // Your plugin is no longer associated with an Activity.
+            // You must clean up all resources and references. Your
+            // plugin may, or may not ever be associated with an Activity
+            // again.
+        }
+    }
