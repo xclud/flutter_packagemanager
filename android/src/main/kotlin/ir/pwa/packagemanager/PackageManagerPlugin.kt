@@ -61,6 +61,8 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
             val packageName = call.arguments<String>()
             uninstallPackage(packageName)
             result.success(true)
+        } else if (call.method == "getPackageName") {
+            result.success(getPackageName())
         } else if (call.method == "openDefaultAppsSettings") {
             openDefaultAppsSettings()
             result.success(true)
@@ -98,6 +100,10 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
         val intent = Intent(Intent.ACTION_DELETE, Uri.fromParts("package",
                 packageName, null))
         context.startActivity(intent)
+    }
+
+    private fun getPackageName(): String {
+        return context.packageName;
     }
 
     private fun openDefaultAppsSettings() {

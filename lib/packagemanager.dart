@@ -28,7 +28,10 @@ class PackageManager {
   }
 
   Future<String> resolveActivity(String action, List<String> categories) async {
-    final Map<String, Object> map = {'action': action, 'categories': categories};
+    final Map<String, Object> map = {
+      'action': action,
+      'categories': categories
+    };
 
     final String packageName =
         await _channel.invokeMethod('resolveActivity', map);
@@ -43,6 +46,10 @@ class PackageManager {
 
   Future<void> uninstallPackage(String packageName) async {
     await _channel.invokeMethod('uninstallPackage', packageName);
+  }
+
+  Future<String> getPackageName() async {
+    return _channel.invokeMethod('getPackageName');
   }
 
   Future<void> openDefaultAppsSettings() async {
