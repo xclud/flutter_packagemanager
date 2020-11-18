@@ -77,7 +77,7 @@ class PackageManagerPlugin : FlutterPlugin, MethodCallHandler {
         context.unregisterReceiver(broadcastReceiver)
     }
 
-    private fun resolveActivity(action: String, categories: Array<String>?): String? {
+    private fun resolveActivity(action: String?, categories: Array<String>?): String? {
         val intent = Intent()
         intent.action = action
 
