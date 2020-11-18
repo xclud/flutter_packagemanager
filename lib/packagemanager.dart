@@ -28,8 +28,10 @@ class PackageManager {
   }
 
   Future<String> resolveActivity(String action, List<String> categories) async {
+    final Map<String, Object> map = {'action': action, 'categories': categories};
+
     final String packageName =
-    await _channel.invokeMethod('resolveActivity', {action, categories});
+        await _channel.invokeMethod('resolveActivity', map);
     return packageName;
   }
 
