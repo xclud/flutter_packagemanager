@@ -4,21 +4,23 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.WallpaperManager
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.io.File
+import java.lang.reflect.Method
 
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
 
 /** PackageManagerPlugin */
 class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
@@ -111,6 +113,31 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
             result.activityInfo.packageName
         } else null
     }
+
+
+//    private val INSTALL_REPLACE_EXISTING = 0x00000002
+//    fun installPackage(fileName: String) {
+//        try {
+//            val pkgManager = context.packageManager
+//            val installPackage: Method = pkgManager.javaClass.getMethod("installPackage", Uri::class.java, IPackageInstallObserver::class.java, Int::class.javaPrimitiveType, String::class.java)
+//            val androidAPK = Uri.fromFile(File(fileName))
+//            val params = arrayOf<Any?>(androidAPK, null, INSTALL_REPLACE_EXISTING, "")
+//            installPackage.invoke(pkgManager, params)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+//
+//    fun deletePackage(packageName: String) {
+//        try {
+//            val pkgManager = context.packageManager
+//            val deletePackage: Method = pkgManager.javaClass.getMethod("installPackage", Array<String>::class.java, IPackageDeleteObserver::class.java, Int::class.javaPrimitiveType)
+//            val params = arrayOf<Any?>(packageName, null, 0)
+//            deletePackage.invoke(pkgManager, params)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
 
     private fun uninstallPackage(packageName: String?) {
         val intent = Intent(Intent.ACTION_DELETE, Uri.fromParts("package",
