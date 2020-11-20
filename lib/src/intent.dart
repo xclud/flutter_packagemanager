@@ -4,6 +4,7 @@ class Intent {
   String action;
   String data;
   String type;
+  int flags;
   final List<String> _categories = [];
   final Map<String, dynamic> _extras = {};
 
