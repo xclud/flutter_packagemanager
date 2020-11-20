@@ -94,6 +94,7 @@ class Intent {
   static const String CATEGORY_DEFAULT = "android.intent.category.DEFAULT";
   static const String CATEGORY_HOME = "android.intent.category.HOME";
   static const String CATEGORY_INFO = "android.intent.category.INFO";
+  static const String CATEGORY_LAUNCHER = "android.intent.category.LAUNCHER";
 }
 
 class MediaStore {
