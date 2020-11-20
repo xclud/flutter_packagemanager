@@ -62,9 +62,8 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
         } else if (call.method == "resolveActivity") {
-            val action = call.argument<String>("action")
-            val categories = call.argument<ArrayList<String>>("categories");
-            result.success(resolveActivity(action, categories))
+            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>);
+            result.success(resolveActivity(intent))
         } else if (call.method == "uninstallPackage") {
             val packageName = call.arguments<String>()
             uninstallPackage(packageName)
@@ -97,16 +96,7 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         context.unregisterReceiver(broadcastReceiver)
     }
 
-    private fun resolveActivity(action: String?, categories: ArrayList<String>?): String? {
-        val intent = Intent()
-        intent.action = action
-
-        if (categories != null) {
-            for (category in categories) {
-                intent.addCategory(category)
-            }
-        }
-
+    private fun resolveActivity(intent: Intent): String? {
         val packageManager = context.packageManager
         val result = packageManager.resolveActivity(intent, 0)
         return if (result?.activityInfo != null) {
@@ -208,4 +198,6 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         // plugin may, or may not ever be associated with an Activity
         // again.
     }
+
+
 }

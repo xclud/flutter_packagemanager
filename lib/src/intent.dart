@@ -4,17 +4,17 @@ class Intent {
   String action;
   String data;
   String type;
-  final List<String> _category = [];
+  final List<String> _categories = [];
   final Map<String, dynamic> _extras = {};
 
-  List<String> get category => _category;
+  List<String> get categories => _categories;
 
   Map<String, dynamic> get extras => _extras;
 
-  set category(List<String> categories) {
-    _category.clear();
-    if (category != null) {
-      _category.addAll(categories);
+  set categories(List<String> cats) {
+    _categories.clear();
+    if (cats != null) {
+      _categories.addAll(cats);
     }
   }
 
@@ -32,12 +32,17 @@ class Intent {
     final String data = json['data'];
     final String type = json['type'];
     final extras = json['extras'];
+    final categories = json['categories'];
 
     final intent = Intent(action, data);
 
     intent.type = type;
     if (extras != null) {
       intent.extras = Map.from(extras);
+    }
+
+    if (categories != null) {
+      intent.categories = List.from(categories);
     }
 
     return intent;
@@ -49,7 +54,7 @@ class Intent {
     json['action'] = action;
     json['data'] = data;
     json['type'] = type;
-    json['category'] = _category;
+    json['categories'] = _categories;
     json['extras'] = _extras;
 
     return json;

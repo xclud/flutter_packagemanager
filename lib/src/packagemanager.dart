@@ -28,18 +28,9 @@ class PackageManager {
     return version;
   }
 
-  Future<String> getLauncherPackageName() async {
-    return resolveActivity(Intent.ACTION_MAIN, [Intent.CATEGORY_HOME]);
-  }
-
-  Future<String> resolveActivity(String action, List<String> categories) async {
-    final Map<String, Object> map = {
-      'action': action,
-      'categories': categories
-    };
-
+  Future<String> resolveActivity(Intent intent) async {
     final String packageName =
-        await _channel.invokeMethod('resolveActivity', map);
+        await _channel.invokeMethod('resolveActivity', intent.toJson());
     return packageName;
   }
 
