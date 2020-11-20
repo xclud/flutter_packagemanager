@@ -50,12 +50,25 @@ class Intent {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    if (action != null) {
+      json['action'] = action;
+    }
+    if (data != null) {
+      json['data'] = data;
+    }
+    if (type != null) {
+      json['type'] = type;
+    }
+    if (_categories.isNotEmpty) {
+      json['categories'] = _categories;
+    }
+    if (_extras.isNotEmpty) {
+      json['extras'] = _extras;
+    }
 
-    json['action'] = action;
-    json['data'] = data;
-    json['type'] = type;
-    json['categories'] = _categories;
-    json['extras'] = _extras;
+    if (flags != null) {
+      json['flags'] = flags;
+    }
 
     return json;
   }

@@ -11,11 +11,15 @@ fun getIntentFromHashMap(hashMap: HashMap<String, Any?>): Intent {
     }
 
     if (hashMap.containsKey("data")) {
-        intent.data = Uri.parse(hashMap["data"] as String)
+        val data = hashMap["data"] as String?
+        if (data != null) {
+            intent.data = Uri.parse(data)
+        }
     }
 
     if (hashMap.containsKey("type")) {
-        intent.type = hashMap["type"] as String
+        val type = hashMap["type"] as String?
+        intent.type = type
     }
 
     if (hashMap.containsKey("flags")) {
