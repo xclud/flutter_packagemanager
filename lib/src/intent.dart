@@ -43,7 +43,6 @@ class Intent {
     return intent;
   }
 
-
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
 
@@ -76,4 +75,13 @@ class Intent {
   static const String CATEGORY_DEFAULT = "android.intent.category.DEFAULT";
   static const String CATEGORY_HOME = "android.intent.category.HOME";
   static const String CATEGORY_INFO = "android.intent.category.INFO";
+}
+
+class MediaStore {
+  static const ACTION_IMAGE_CAPTURE = "android.media.action.IMAGE_CAPTURE";
+  static const ACTION_IMAGE_CAPTURE_SECURE =
+      "android.media.action.IMAGE_CAPTURE_SECURE";
+  static const ACTION_REVIEW = "android.provider.action.REVIEW";
+  static const ACTION_REVIEW_SECURE = "android.provider.action.REVIEW_SECURE";
+  static const ACTION_VIDEO_CAPTURE = "android.media.action.VIDEO_CAPTURE";
 }
