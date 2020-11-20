@@ -55,6 +55,24 @@ class PackageManager {
   Future<void> openDefaultAppsSettings() async {
     await _channel.invokeMethod('openDefaultAppsSettings');
   }
+
+  Future<void> setWallpaperOffsets(double xOffset, double yOffset) async {
+    final Map<String, Object> map = {
+      'xOffset': xOffset,
+      'yOffset': yOffset
+    };
+
+    await _channel.invokeMethod('setWallpaperOffsets', map);
+  }
+
+  Future<void> setWallpaperOffsetSteps(double xStep, double yStep) async {
+    final Map<String, Object> map = {
+      'xStep': xStep,
+      'yStep': yStep
+    };
+
+    await _channel.invokeMethod('setWallpaperOffsetSteps', map);
+  }
 }
 
 class Intent {

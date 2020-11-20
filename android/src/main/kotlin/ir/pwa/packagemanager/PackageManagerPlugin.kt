@@ -146,7 +146,7 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
 
     @SuppressLint("NewApi")
     private fun setWallpaperOffsets(xOffset: Float, yOffset: Float) {
-        val b = activity.window.decorView.windowToken;
+        val b = activity.window.decorView.rootView.windowToken;
         val w = WallpaperManager.getInstance(context)
         w.setWallpaperOffsets(b, xOffset, yOffset)
     }

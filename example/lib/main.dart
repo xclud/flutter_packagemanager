@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:packagemanager/packagemanager.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(MyApp());
@@ -51,6 +52,14 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: Text('Running on: $_platformVersion\n'),
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.delete_forever),
+          onPressed: () async{
+            await Permission.storage.request();
+            PackageManager.instance.setWallpaperOffsetSteps(2, 0);
+            PackageManager.instance.setWallpaperOffsets(0.5, 0);
+          },
         ),
       ),
     );
