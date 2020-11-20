@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:packagemanager/src/activity_info.dart';
 import 'package:packagemanager/src/intent.dart';
 
 class PackageManager {
@@ -34,6 +35,21 @@ class PackageManager {
     return packageName;
   }
 
+  Future<List<ActivityInfo>> queryIntentActivities(Intent intent) async {
+    final result =
+        await _channel.invokeMethod('queryIntentActivities', intent.toJson());
+
+    final list = List.from(result);
+
+    final val = list.map((e) => Map.from(e)).map(
+          (e) => ActivityInfo.fromJson(
+            Map<String, dynamic>.from(e),
+          ),
+        );
+
+    return val.toList();
+  }
+
   Future<List<String>> getPackagesForUid(int uid) async {
     final List<String> packages =
         await _channel.invokeMethod('getPackagesForUid', uid);
@@ -42,6 +58,10 @@ class PackageManager {
 
   Future<void> uninstallPackage(String packageName) async {
     await _channel.invokeMethod('uninstallPackage', packageName);
+  }
+
+  Future<void> startActivity(Intent intent) async {
+    await _channel.invokeMethod('startActivity', intent.toJson());
   }
 
   Future<String> getPackageName() async {

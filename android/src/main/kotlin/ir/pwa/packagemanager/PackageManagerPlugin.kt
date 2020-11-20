@@ -3,14 +3,14 @@ package ir.pwa.packagemanager
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.WallpaperManager
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.provider.Settings
 import android.provider.Telephony
+import android.util.Log
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -20,6 +20,9 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 /** PackageManagerPlugin */
@@ -64,6 +67,12 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         } else if (call.method == "resolveActivity") {
             val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>);
             result.success(resolveActivity(intent))
+        } else if (call.method == "queryIntentActivities") {
+            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>);
+            result.success(queryIntentActivities(intent))
+        } else if (call.method == "startActivity") {
+            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>);
+            result.success(startActivity(intent))
         } else if (call.method == "uninstallPackage") {
             val packageName = call.arguments<String>()
             uninstallPackage(packageName)
@@ -106,6 +115,24 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         } else null
     }
 
+    private fun queryIntentActivities(intent: Intent): ArrayList<HashMap<String, Any>> {
+        val packageManager = context.packageManager
+        val appList = packageManager.queryIntentActivities(intent, 0)
+        Collections.sort(appList, ResolveInfo.DisplayNameComparator(packageManager))
+
+        val apps = ArrayList<HashMap<String, Any>>()
+        for (temp in appList) {
+            val app = HashMap<String, Any>()
+
+            app["packageName"] = temp.activityInfo.packageName;
+            app["name"] = temp.activityInfo.name;
+
+            apps.add(app);
+        }
+
+        return apps;
+    }
+
 
 //    private val INSTALL_REPLACE_EXISTING = 0x00000002
 //    fun installPackage(fileName: String) {
@@ -134,6 +161,10 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     private fun uninstallPackage(packageName: String?) {
         val intent = Intent(Intent.ACTION_DELETE, Uri.fromParts("package",
                 packageName, null))
+        context.startActivity(intent)
+    }
+
+    private fun startActivity(intent: Intent) {
         context.startActivity(intent)
     }
 
