@@ -43,16 +43,17 @@ class Intent {
     return intent;
   }
 
+
   Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
+    final json = <String, dynamic>{};
 
-    data['action'] = action;
-    data['data'] = data;
-    data['type'] = type;
-    data['category'] = _category;
-    data['extras'] = _extras;
+    json['action'] = action;
+    json['data'] = data;
+    json['type'] = type;
+    json['category'] = _category;
+    json['extras'] = _extras;
 
-    return data;
+    return json;
   }
 
   @override
