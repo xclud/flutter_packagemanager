@@ -22,28 +22,28 @@ class PackageManagerBroadcastReceiver(private val methodChannel: MethodChannel) 
         }
 
 
-        val json = JSONObject()
-        json.put("action", p1.action)
-        json.put("data", p1.data.toString())
-        json.put("flags", p1.flags)
-        json.put("package", p1.`package`)
-        json.put("scheme", p1.scheme)
-        json.put("type", p1.type)
+        val json = HashMap<String, Any>()
+        json["action"] = p1.action!!
+        json["data"] = p1.data.toString()
+        json["flags"] = p1.flags
+        json["package"] = p1.`package`!!
+        json["scheme"] = p1.scheme!!
+        json["type"] = p1.type!!
 
         if (p1.extras != null) {
             val keys = p1.extras!!.keySet()
-            val extras = JSONObject()
+            val extras = HashMap<String, Any?>()
 
             for (key in keys) {
                 try {
-                    extras.put(key, JSONObject.wrap(p1.extras!!.get(key)))
+                    extras[key] = p1.extras!!.get(key)
                 } catch (e: JSONException) {
                     //Handle exception here
                 }
             }
-            json.put("extras", extras)
+            json["extras"] = extras
         }
 
-        methodChannel.invokeMethod("packagemanager", json.toString())
+        methodChannel.invokeMethod("packagemanager", json)
     }
 }
