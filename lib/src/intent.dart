@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Intent {
   String action;
   String data;
@@ -19,6 +21,21 @@ class Intent {
     final String data = json['data'];
 
     return Intent(action, data);
+  }
+
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{};
+
+    data['action'] = action;
+    data['data'] = data;
+    data['category'] = _category;
+
+    return data;
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(toJson());
   }
 
   static const String ACTION_PACKAGE_ADDED =
