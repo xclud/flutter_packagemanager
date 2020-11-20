@@ -11,7 +11,7 @@ class PackageManager {
   final _streamController = StreamController<Intent>();
 
   Future<dynamic> _platformCallHandler(MethodCall call) async {
-    final Map<String, dynamic> json = call.arguments;
+    final Map<String, dynamic> json = Map.from(call.arguments);
 
     final intent = Intent.fromJson(json);
     _streamController.add(intent);

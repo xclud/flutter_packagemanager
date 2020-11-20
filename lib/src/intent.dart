@@ -3,9 +3,13 @@ import 'dart:convert';
 class Intent {
   String action;
   String data;
+  String type;
   final List<String> _category = [];
+  final Map<String, dynamic> _extras = {};
 
   List<String> get category => _category;
+
+  Map<String, dynamic> get extras => _extras;
 
   set category(List<String> categories) {
     _category.clear();
@@ -14,13 +18,29 @@ class Intent {
     }
   }
 
+  set extras(Map<String, dynamic> extras) {
+    _extras.clear();
+    if (extras != null) {
+      _extras.addAll(extras);
+    }
+  }
+
   Intent(this.action, [this.data]);
 
   factory Intent.fromJson(Map<String, dynamic> json) {
     final String action = json['action'];
     final String data = json['data'];
+    final String type = json['type'];
+    final extras = json['extras'];
 
-    return Intent(action, data);
+    final intent = Intent(action, data);
+
+    intent.type = type;
+    if (extras != null) {
+      intent.extras = Map.from(extras);
+    }
+
+    return intent;
   }
 
   Map<String, dynamic> toJson() {
@@ -28,7 +48,9 @@ class Intent {
 
     data['action'] = action;
     data['data'] = data;
+    data['type'] = type;
     data['category'] = _category;
+    data['extras'] = _extras;
 
     return data;
   }

@@ -22,13 +22,11 @@ class PackageManagerBroadcastReceiver(private val methodChannel: MethodChannel) 
         }
 
 
-        val json = HashMap<String, Any>()
-        json["action"] = p1.action!!
-        json["data"] = p1.data.toString()
+        val json = HashMap<String, Any?>()
+        json["action"] = p1.action
+        json["data"] = p1.data?.toString()
         json["flags"] = p1.flags
-        json["package"] = p1.`package`!!
-        json["scheme"] = p1.scheme!!
-        json["type"] = p1.type!!
+        json["type"] = p1.type
 
         if (p1.extras != null) {
             val keys = p1.extras!!.keySet()
