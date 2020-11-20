@@ -52,6 +52,10 @@ class PackageManager {
     await _channel.invokeMethod('openDefaultAppsSettings');
   }
 
+  Future<String> getDefaultSmsPackage() async {
+    return _channel.invokeMethod('getDefaultSmsPackage');
+  }
+
   Future<void> setWallpaperOffsets(double xOffset, double yOffset) async {
     final Map<String, Object> map = {'xOffset': xOffset, 'yOffset': yOffset};
 

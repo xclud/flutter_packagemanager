@@ -3,12 +3,14 @@ package ir.pwa.packagemanager
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.WallpaperManager
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import android.provider.Telephony
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -18,8 +20,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import java.io.File
-import java.lang.reflect.Method
 
 
 /** PackageManagerPlugin */
@@ -86,6 +86,8 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
             val yStep = call.argument<Double>("yStep")
             setWallpaperOffsetSteps(xStep!!.toFloat(), yStep!!.toFloat())
             result.success(true)
+        } else if (call.method == "getDefaultSmsPackage") {
+            result.success(getDefaultSmsPackage())
         } else {
             result.notImplemented()
         }
@@ -137,6 +139,19 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
 
     private fun getPackageName(): String {
         return context.packageName;
+    }
+
+    @SuppressLint("NewApi")
+    private fun getDefaultSmsPackage(): String {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            Telephony.Sms.getDefaultSmsPackage(context)
+        } else {
+            val defApp = Settings.Secure.getString(context.contentResolver, "sms_default_application")
+            val pm = context.packageManager
+            val iIntent = pm.getLaunchIntentForPackage(defApp)
+            val mInfo = pm.resolveActivity(iIntent, 0)
+            mInfo.activityInfo.packageName
+        }
     }
 
     @SuppressLint("InlinedApi")
