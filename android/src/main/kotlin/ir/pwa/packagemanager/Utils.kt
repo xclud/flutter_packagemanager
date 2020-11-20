@@ -40,9 +40,9 @@ fun getIntentFromHashMap(hashMap: HashMap<String, Any?>): Intent {
             val key = extra.key as String;
             val value = extra.value;
             if (value is Int) {
-                intent.extras!!.putInt(key, value)
+                intent.putExtra(key, value)
             } else if (value is String) {
-                intent.extras!!.putString(key, value)
+                intent.putExtra(key, value)
             }
         }
     }
