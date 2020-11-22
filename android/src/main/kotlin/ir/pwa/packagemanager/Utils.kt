@@ -1,6 +1,7 @@
 package ir.pwa.packagemanager
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
@@ -15,6 +16,7 @@ import android.os.Build
 import android.util.Base64
 import java.io.ByteArrayOutputStream
 import java.util.*
+import kotlin.collections.HashMap
 
 
 private const val SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM or 128
@@ -89,6 +91,15 @@ fun getIntentFromHashMap(hashMap: HashMap<String, Any?>): Intent {
 
     if (hashMap.containsKey("flags")) {
         intent.flags = hashMap["flags"] as Int
+    }
+
+
+    if (hashMap.containsKey("component")) {
+        val c = hashMap["component"] as HashMap<*, *>
+        val packageName = c["package"] as String
+        val className = c["class"] as String
+
+        intent.component = ComponentName(packageName, className)
     }
 
     if (hashMap.containsKey("categories")) {

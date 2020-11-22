@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:packagemanager/src/activity_info.dart';
 import 'package:packagemanager/src/intent.dart';
 import 'package:packagemanager/src/resolve_info.dart';
 

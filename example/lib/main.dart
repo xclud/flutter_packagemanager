@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:packagemanager/packagemanager.dart';
 import 'package:packagemanager/packagemanager.dart' as pm;
-import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(MyApp());
@@ -45,8 +43,17 @@ class _MyAppState extends State<MyApp> {
               .map(
                 (e) => ListTile(
                   leading: Image.memory(e.icon),
-                  title: Text(e.activityInfo.name),
-                  subtitle: Text(e.activityInfo.packageName),
+                  isThreeLine: true,
+                  title: Text(e.activityInfo.label),
+                  subtitle: Text(
+                      '${e.activityInfo.name}\n${e.activityInfo.packageName}'),
+                  onTap: () {
+                    final intent = pm.Intent();
+                    intent.component = pm.ComponentName(
+                        e.activityInfo.packageName, e.activityInfo.name);
+
+                    PackageManager.instance.startActivity(intent);
+                  },
                 ),
               )
               .toList(),

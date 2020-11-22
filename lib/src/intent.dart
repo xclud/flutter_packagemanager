@@ -5,6 +5,7 @@ class Intent {
   String data;
   String type;
   int flags;
+  ComponentName component;
   final List<String> _categories = [];
   final Map<String, dynamic> _extras = {};
 
@@ -26,7 +27,7 @@ class Intent {
     }
   }
 
-  Intent(this.action, [this.data]);
+  Intent([this.action]);
 
   factory Intent.fromJson(Map<String, dynamic> json) {
     final String action = json['action'];
@@ -35,7 +36,10 @@ class Intent {
     final extras = json['extras'];
     final categories = json['categories'];
 
-    final intent = Intent(action, data);
+    final intent = Intent();
+
+    intent.action = action;
+    intent.data = data;
 
     intent.type = type;
     if (extras != null) {
@@ -71,6 +75,10 @@ class Intent {
       json['flags'] = flags;
     }
 
+    if (component != null) {
+      json['component'] = component.toJson();
+    }
+
     return json;
   }
 
@@ -104,4 +112,24 @@ class MediaStore {
   static const ACTION_REVIEW = "android.provider.action.REVIEW";
   static const ACTION_REVIEW_SECURE = "android.provider.action.REVIEW_SECURE";
   static const ACTION_VIDEO_CAPTURE = "android.media.action.VIDEO_CAPTURE";
+}
+
+class ComponentName {
+  final String packageName;
+  final String className;
+
+  ComponentName(this.packageName, this.className);
+
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{};
+    json['package'] = packageName;
+    json['class'] = className;
+
+    return json;
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(toJson());
+  }
 }

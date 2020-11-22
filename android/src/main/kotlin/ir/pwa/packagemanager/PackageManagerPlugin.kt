@@ -66,14 +66,15 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
         } else if (call.method == "resolveActivity") {
-            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>);
+            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
             result.success(resolveActivity(intent))
         } else if (call.method == "queryIntentActivities") {
-            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>);
+            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
             result.success(queryIntentActivities(intent))
         } else if (call.method == "startActivity") {
-            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>);
-            result.success(startActivity(intent))
+            val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
+            startActivity(intent)
+            result.success(true)
         } else if (call.method == "uninstallPackage") {
             val packageName = call.arguments<String>()
             uninstallPackage(packageName)
