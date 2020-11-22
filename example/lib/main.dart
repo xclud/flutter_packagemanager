@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:packagemanager/packagemanager.dart';
+import 'package:packagemanager/packagemanager.dart' as pm;
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  List<ResolveInfo> _apps = [];
 
   @override
   void initState() {
@@ -23,24 +24,13 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await PackageManager.instance.getPlatformVersion();
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
+    final mainIntent = pm.Intent(pm.Intent.ACTION_MAIN)
+      ..categories = [pm.Intent.CATEGORY_LAUNCHER];
+    final all = await PackageManager.instance.queryIntentActivities(mainIntent);
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+    _apps.addAll(all);
+    setState(() {});
   }
 
   @override
@@ -50,16 +40,16 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.delete_forever),
-          onPressed: () async{
-            await Permission.storage.request();
-            PackageManager.instance.setWallpaperOffsetSteps(2, 0);
-            PackageManager.instance.setWallpaperOffsets(0.5, 0);
-          },
+        body: ListView(
+          children: _apps
+              .map(
+                (e) => ListTile(
+                  leading: Image.memory(e.icon),
+                  title: Text(e.activityInfo.name),
+                  subtitle: Text(e.activityInfo.packageName),
+                ),
+              )
+              .toList(),
         ),
       ),
     );

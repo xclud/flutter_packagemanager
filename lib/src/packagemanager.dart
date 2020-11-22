@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:packagemanager/src/activity_info.dart';
 import 'package:packagemanager/src/intent.dart';
+import 'package:packagemanager/src/resolve_info.dart';
 
 class PackageManager {
   static final PackageManager instance = PackageManager._();
@@ -35,14 +36,14 @@ class PackageManager {
     return packageName;
   }
 
-  Future<List<ActivityInfo>> queryIntentActivities(Intent intent) async {
+  Future<List<ResolveInfo>> queryIntentActivities(Intent intent) async {
     final result =
         await _channel.invokeMethod('queryIntentActivities', intent.toJson());
 
     final list = List.from(result);
 
     final val = list.map((e) => Map.from(e)).map(
-          (e) => ActivityInfo.fromJson(
+          (e) =>  ResolveInfo.fromJson(
             Map<String, dynamic>.from(e),
           ),
         );

@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ResolveInfo
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.Settings
 import android.provider.Telephony
-import android.util.Log
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -19,6 +19,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.*
 import kotlin.collections.ArrayList
@@ -26,7 +27,7 @@ import kotlin.collections.HashMap
 
 
 /** PackageManagerPlugin */
-class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
+class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListener, MethodCallHandler {
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -115,6 +116,10 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         } else null
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Boolean {
+        return false;
+    }
+
     private fun queryIntentActivities(intent: Intent): ArrayList<HashMap<String, Any>> {
         val packageManager = context.packageManager
         val appList = packageManager.queryIntentActivities(intent, 0)
@@ -122,12 +127,22 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
 
         val apps = ArrayList<HashMap<String, Any>>()
         for (temp in appList) {
-            val app = HashMap<String, Any>()
 
-            app["packageName"] = temp.activityInfo.packageName;
-            app["name"] = temp.activityInfo.name;
+            val icon = temp.loadIcon(packageManager)
+            val encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100)
 
-            apps.add(app);
+            val resolveInfo = HashMap<String, Any>()
+            val activityInfo = HashMap<String, Any>()
+
+            activityInfo["packageName"] = temp.activityInfo.packageName;
+            activityInfo["name"] = temp.activityInfo.name;
+            activityInfo["enabled"] = temp.activityInfo.enabled;
+
+
+            resolveInfo["icon"] = encodedImage
+            resolveInfo["activityInfo"] = activityInfo
+
+            apps.add(resolveInfo);
         }
 
         return apps;
