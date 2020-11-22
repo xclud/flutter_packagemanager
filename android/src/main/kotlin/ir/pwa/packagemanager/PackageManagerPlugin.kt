@@ -134,9 +134,11 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
             val resolveInfo = HashMap<String, Any>()
             val activityInfo = HashMap<String, Any>()
 
-            activityInfo["packageName"] = temp.activityInfo.packageName;
-            activityInfo["name"] = temp.activityInfo.name;
-            activityInfo["enabled"] = temp.activityInfo.enabled;
+            activityInfo["label"] = temp.activityInfo.loadLabel(packageManager).toString()
+            activityInfo["packageName"] = temp.activityInfo.packageName
+            activityInfo["name"] = temp.activityInfo.name
+            activityInfo["enabled"] = temp.activityInfo.enabled
+            activityInfo["exported"] = temp.activityInfo.exported
 
 
             resolveInfo["icon"] = encodedImage
