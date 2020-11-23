@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     final mainIntent = pm.Intent(pm.Intent.ACTION_MAIN)
       ..categories = [pm.Intent.CATEGORY_LAUNCHER];
-    final all = await PackageManager.instance.queryIntentActivities(mainIntent);
+    final all = await packageManager.queryIntentActivities(mainIntent);
 
     _apps.addAll(all);
     setState(() {});
@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
                     intent.component = pm.ComponentName(
                         e.activityInfo.packageName, e.activityInfo.name);
 
-                    PackageManager.instance.startActivity(intent);
+                    packageManager.startActivity(intent);
                   },
                 ),
               )

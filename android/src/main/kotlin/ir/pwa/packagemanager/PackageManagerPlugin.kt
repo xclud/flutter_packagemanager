@@ -6,6 +6,9 @@ import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.net.Uri
@@ -18,11 +21,8 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
-import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
@@ -62,16 +62,16 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
         })
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        } else if (call.method == "resolveActivity") {
+        } else if (call.method == "packageManager.resolveActivity") {
             val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
-            result.success(resolveActivity(intent))
-        } else if (call.method == "queryIntentActivities") {
+            result.success(resolveActivity(intent,0))
+        } else if (call.method == "packageManager.queryIntentActivities") {
             val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
             result.success(queryIntentActivities(intent))
-        } else if (call.method == "startActivity") {
+        } else if (call.method == "context.startActivity") {
             val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
             startActivity(intent)
             result.success(true)
@@ -84,7 +84,7 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
         } else if (call.method == "openDefaultAppsSettings") {
             openDefaultAppsSettings()
             result.success(true)
-        } else if (call.method == "getPackagesForUid") {
+        } else if (call.method == "packageManager.getPackagesForUid") {
             val packages = context.packageManager.getPackagesForUid(call.arguments<Int>())
             result.success(packages)
         } else if (call.method == "setWallpaperOffsets") {
@@ -109,48 +109,42 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
         context.unregisterReceiver(broadcastReceiver)
     }
 
-    private fun resolveActivity(intent: Intent): String? {
+    private fun resolveActivity(intent: Intent, i: Int): HashMap<String, Any?>? {
         val packageManager = context.packageManager
-        val result = packageManager.resolveActivity(intent, 0)
-        return if (result?.activityInfo != null) {
-            result.activityInfo.packageName
-        } else null
+        val result = packageManager.resolveActivity(intent, i)
+        return result?.toHashMap(context.packageManager)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Boolean {
         return false;
     }
 
-    private fun queryIntentActivities(intent: Intent): ArrayList<HashMap<String, Any>> {
+    private fun queryIntentActivities(intent: Intent): ArrayList<HashMap<String, Any?>> {
         val packageManager = context.packageManager
         val appList = packageManager.queryIntentActivities(intent, 0)
         Collections.sort(appList, ResolveInfo.DisplayNameComparator(packageManager))
 
-        val apps = ArrayList<HashMap<String, Any>>()
+        val apps = ArrayList<HashMap<String, Any?>>()
         for (temp in appList) {
-
-            val icon = temp.loadIcon(packageManager)
-            val encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100)
-
-            val resolveInfo = HashMap<String, Any>()
-            val activityInfo = HashMap<String, Any>()
-
-            activityInfo["label"] = temp.activityInfo.loadLabel(packageManager).toString()
-            activityInfo["packageName"] = temp.activityInfo.packageName
-            activityInfo["name"] = temp.activityInfo.name
-            activityInfo["enabled"] = temp.activityInfo.enabled
-            activityInfo["exported"] = temp.activityInfo.exported
-
-
-            resolveInfo["icon"] = encodedImage
-            resolveInfo["activityInfo"] = activityInfo
-
-            apps.add(resolveInfo);
+            apps.add(temp.toHashMap(packageManager))
         }
 
         return apps;
     }
 
+    private fun getPackageInfo(packageName: String): ArrayList<ActivityInfo>? {
+
+        val result = HashMap<String, Any>()
+
+        return try {
+            val pi = context.packageManager.getPackageInfo(
+                    packageName, PackageManager.GET_ACTIVITIES)
+            ArrayList(listOf(*pi.activities))
+        } catch (e: NameNotFoundException) {
+            e.printStackTrace()
+            null
+        }
+    }
 
 //    private val INSTALL_REPLACE_EXISTING = 0x00000002
 //    fun installPackage(fileName: String) {
@@ -191,7 +185,7 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
     }
 
     @SuppressLint("NewApi")
-    private fun getDefaultSmsPackage(): String {
+    private fun getDefaultSmsPackage(): String? {
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             Telephony.Sms.getDefaultSmsPackage(context)
         } else {
@@ -199,7 +193,7 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
             val pm = context.packageManager
             val iIntent = pm.getLaunchIntentForPackage(defApp)
             val mInfo = pm.resolveActivity(iIntent, 0)
-            mInfo.activityInfo.packageName
+            mInfo?.activityInfo?.packageName
         }
     }
 
@@ -264,4 +258,27 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
     }
 
 
+}
+
+private fun ActivityInfo.toHashMap(packageManager: PackageManager): HashMap<String, Any> {
+    val activityInfo = HashMap<String, Any>()
+
+    activityInfo["label"] = loadLabel(packageManager).toString()
+    activityInfo["packageName"] = packageName
+    activityInfo["name"] = name
+    activityInfo["enabled"] = enabled
+    activityInfo["exported"] = exported
+
+    return activityInfo;
+}
+
+private fun ResolveInfo.toHashMap(packageManager: PackageManager): HashMap<String, Any?> {
+    val resolveInfo = HashMap<String, Any?>()
+    resolveInfo["activityInfo"] = activityInfo?.toHashMap(packageManager)
+
+    val icon = loadIcon(packageManager)
+    val encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100)
+    resolveInfo["icon"] = encodedImage
+
+    return resolveInfo
 }
