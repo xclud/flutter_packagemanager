@@ -3,6 +3,8 @@ package ir.pwa.packagemanager
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.WallpaperManager
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -36,6 +38,9 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
     private lateinit var context: Context
     private lateinit var activity: Activity
     private lateinit var broadcastReceiver: PackageManagerBroadcastReceiver
+    private lateinit var appWidgetManager: AppWidgetManager
+    private lateinit var appWidgetHost: AppWidgetHost
+
 
     @SuppressLint("InlinedApi")
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -43,7 +48,12 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "packagemanager")
         channel.setMethodCallHandler(this)
 
-        broadcastReceiver = PackageManagerBroadcastReceiver(channel);
+        appWidgetManager = AppWidgetManager.getInstance(context)
+        appWidgetHost = AppWidgetHost(context, 100)
+
+
+        broadcastReceiver = PackageManagerBroadcastReceiver(channel)
+
 
         context.registerReceiver(broadcastReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -67,7 +77,7 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
         } else if (call.method == "packageManager.resolveActivity") {
             val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
-            result.success(resolveActivity(intent,0))
+            result.success(resolveActivity(intent, 0))
         } else if (call.method == "packageManager.queryIntentActivities") {
             val intent = getIntentFromHashMap(call.arguments as HashMap<String, Any?>)
             result.success(queryIntentActivities(intent))
@@ -87,6 +97,13 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
         } else if (call.method == "packageManager.getPackagesForUid") {
             val packages = context.packageManager.getPackagesForUid(call.arguments<Int>())
             result.success(packages)
+        } else if (call.method == "packageManager.getPackageInfo") {
+            val packageInfo = getPackageInfo(call.arguments<String>())
+            result.success(packageInfo)
+        } else if (call.method == "appWidgetManager.allocateAppWidgetId") {
+            //val appWidgetId = appWidgetManager.allocateAppWidgetId()
+            //val packages = context.packageManager.getPackagesForUid(call.arguments<Int>())
+            //result.success(packages)
         } else if (call.method == "setWallpaperOffsets") {
             val xOffset = call.argument<Double>("xOffset")
             val yOffset = call.argument<Double>("yOffset")
@@ -132,18 +149,24 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
         return apps;
     }
 
-    private fun getPackageInfo(packageName: String): ArrayList<ActivityInfo>? {
+    private fun getPackageInfo(packageName: String): HashMap<String, Any> {
 
-        val result = HashMap<String, Any>()
+        val activities = ArrayList<HashMap<String, Any>>()
 
-        return try {
-            val pi = context.packageManager.getPackageInfo(
-                    packageName, PackageManager.GET_ACTIVITIES)
+        try {
+            val pi = context.packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+            for (activity in pi.activities) {
+                activities.add(activity.toHashMap(context.packageManager))
+            }
+
             ArrayList(listOf(*pi.activities))
         } catch (e: NameNotFoundException) {
-            e.printStackTrace()
-            null
+
         }
+
+        val packageInfo = HashMap<String, Any>();
+        packageInfo["activities"] = activities
+        return packageInfo;
     }
 
 //    private val INSTALL_REPLACE_EXISTING = 0x00000002

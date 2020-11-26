@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:packagemanager/src/intent.dart';
+import 'package:packagemanager/src/package_info.dart';
 import 'package:packagemanager/src/resolve_info.dart';
 
 final _broadcastReceiverController = StreamController<Intent>();
@@ -49,6 +50,12 @@ class PackageManager {
     final List<String> packages =
         await _channel.invokeMethod('packageManager.getPackagesForUid', uid);
     return packages;
+  }
+
+  Future<PackageInfo> getPackageInfo(String packageName) async {
+    final  packageInfo =
+    await _channel.invokeMethod('packageManager.getPackageInfo', packageName);
+    return PackageInfo.fromJson(Map.from(packageInfo));
   }
 }
 

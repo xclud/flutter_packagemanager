@@ -18,6 +18,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await packageManager.getPlatformVersion(), '42');
+    expect(await getPlatformVersion(), '42');
   });
 }

@@ -27,6 +27,9 @@ class _MyAppState extends State<MyApp> {
       ..categories = [pm.Intent.CATEGORY_LAUNCHER];
     final all = await packageManager.queryIntentActivities(mainIntent);
 
+    final pkg = await getPackageName();
+    final pkgInfo = await packageManager.getPackageInfo(pkg);
+
     _apps.addAll(all);
     setState(() {});
   }
@@ -52,7 +55,7 @@ class _MyAppState extends State<MyApp> {
                     intent.component = pm.ComponentName(
                         e.activityInfo.packageName, e.activityInfo.name);
 
-                    packageManager.startActivity(intent);
+                    startActivity(intent);
                   },
                 ),
               )
