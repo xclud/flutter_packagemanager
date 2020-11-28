@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
           children: _apps
               .map(
                 (e) => ListTile(
-                  leading: Image.memory(e.icon),
+                  leading: Image.memory(e.activityInfo.icon),
                   isThreeLine: true,
                   title: Text(e.activityInfo.label),
                   subtitle: Text(

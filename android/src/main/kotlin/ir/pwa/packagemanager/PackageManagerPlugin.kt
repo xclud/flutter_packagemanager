@@ -13,6 +13,7 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.Settings
 import android.provider.Telephony
@@ -286,11 +287,16 @@ class PackageManagerPlugin : FlutterPlugin, ActivityAware, ActivityResultListene
 private fun ActivityInfo.toHashMap(packageManager: PackageManager): HashMap<String, Any> {
     val activityInfo = HashMap<String, Any>()
 
+    activityInfo["icon"] = loadIcon(packageManager).toBase64()
     activityInfo["label"] = loadLabel(packageManager).toString()
     activityInfo["packageName"] = packageName
     activityInfo["name"] = name
     activityInfo["enabled"] = enabled
     activityInfo["exported"] = exported
+
+//    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD) {
+//        activityInfo["logo"] = loadLogo(packageManager).toBase64()
+//    }
 
     return activityInfo;
 }
@@ -298,10 +304,12 @@ private fun ActivityInfo.toHashMap(packageManager: PackageManager): HashMap<Stri
 private fun ResolveInfo.toHashMap(packageManager: PackageManager): HashMap<String, Any?> {
     val resolveInfo = HashMap<String, Any?>()
     resolveInfo["activityInfo"] = activityInfo?.toHashMap(packageManager)
-
-    val icon = loadIcon(packageManager)
-    val encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100)
-    resolveInfo["icon"] = encodedImage
+    resolveInfo["icon"] = loadIcon(packageManager).toBase64()
 
     return resolveInfo
+}
+
+private fun Drawable.toBase64(): String {
+    val bitmap = getBitmapFromDrawable(this)
+    return encodeToBase64(bitmap, Bitmap.CompressFormat.PNG, 100)
 }
